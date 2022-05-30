@@ -19,7 +19,7 @@ const run = async () => {
 }
 
 const releaseFromPR = async (): Promise<void> => {
-  console.log(JSON.stringify(context?.payload))
+  console.log('FROM PR',JSON.stringify(context?.payload))
 
   const {owner, repo, pull_number} = context.payload
   octokit.rest.pulls.listCommits({
