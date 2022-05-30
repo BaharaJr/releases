@@ -43,126 +43,32 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
 const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
-const DESTINATION_BRANCH = core.getInput('DESTINATION_BRANCH');
-const HEAD_BRANCH = core.getInput('HEAD_BRANCH');
-const KEYWORD = core.getInput('KEYWORD');
 const octokit = github.getOctokit(GITHUB_TOKEN);
 const { context = {} } = github;
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const eventName = context.eventName;
-        switch (eventName) {
-            case 'push':
-                return pr();
-            case 'pull_request':
-                core.warning(`Event <${context.eventName}> is still WIP and will be available soon. Please submit an issue to the repo for quick delivery.`);
-                break;
-            default:
-                return pr();
-        }
+const run = () => __awaiter(void 0, void 0, void 0, function* () {
+    const eventName = context.eventName;
+    switch (eventName) {
+        case 'push':
+            return releaseFromPush();
+        case 'pull_request':
+            return releaseFromPR();
+        default:
+            return releaseFromPush();
+    }
+});
+const releaseFromPR = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { owner, repo, pull_number } = context.payload;
+    octokit.rest.pulls.listCommits({
+        owner,
+        repo,
+        pull_number,
     });
-}
-const createorupdatepr = ({ branch, owner, repo, body, full_name }) => __awaiter(void 0, void 0, void 0, function* () {
+});
+const releaseFromPush = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        const existing_pr = yield octokit.rest.pulls.list({
-            owner,
-            repo,
-            state: 'open',
-            head: owner + ':' + branch,
-            base: DESTINATION_BRANCH
-        });
-        if (((_a = existing_pr === null || existing_pr === void 0 ? void 0 : existing_pr.data) === null || _a === void 0 ? void 0 : _a.length) === 0) {
-            // create new pr
-            const createpr = yield octokit.request(`POST /repos/${full_name}/pulls`, {
-                owner,
-                repo,
-                title: branch,
-                body,
-                head: branch,
-                base: DESTINATION_BRANCH
-            });
-            return createpr;
-        }
-        else {
-            // update existing pr
-            const updatepr = yield octokit.rest.pulls.update({
-                pull_number: existing_pr === null || existing_pr === void 0 ? void 0 : existing_pr.data[0].number,
-                owner,
-                repo,
-                title: branch,
-                body,
-                head: branch,
-                base: DESTINATION_BRANCH
-            });
-            return updatepr;
-        }
-    }
-    catch (e) {
-        core.setFailed(e.message);
-    }
-});
-const checkCompareCommits = ({ head, owner, full_name, repo }) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let { commits } = (yield octokit.request(`GET /repos/${full_name}/compare/${DESTINATION_BRANCH}...${head}`, {
-            owner,
-            repo,
-            base: DESTINATION_BRANCH,
-            head
-        })).data;
-        if ((commits || []).length === 0) {
-            core.warning('Trigger has no commit');
-            return;
-        }
-        commits = (commits || [])
-            .map((e, i) => {
-            return i === 0 ? '> ' + e.commit.message : e.commit.message;
-        })
-            .join('\n\n' + '> ');
-        const { data } = yield createorupdatepr({
-            branch: head,
-            owner,
-            repo,
-            full_name,
-            body: commits
-        });
-        core.setOutput('pr_body', commits);
-        core.setOutput('branch', head);
-        core.setOutput('pull_number', data === null || data === void 0 ? void 0 : data.number);
-        core.setOutput('html_url', data === null || data === void 0 ? void 0 : data.html_url);
-    }
-    catch (e) {
-        core.setFailed(e.message);
-    }
-});
-const pr = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
-    try {
-        let branch = HEAD_BRANCH;
-        const { message } = (_b = context === null || context === void 0 ? void 0 : context.payload) === null || _b === void 0 ? void 0 : _b.head_commit;
-        if (!HEAD_BRANCH) {
-            branch = (_d = (_c = context === null || context === void 0 ? void 0 : context.payload) === null || _c === void 0 ? void 0 : _c.ref) === null || _d === void 0 ? void 0 : _d.split('/');
-            branch = branch[branch.length - 1];
-        }
-        if (!KEYWORD) {
-            yield checkCompareCommits({
-                head: branch,
-                owner: (_g = (_f = (_e = context === null || context === void 0 ? void 0 : context.payload) === null || _e === void 0 ? void 0 : _e.repository) === null || _f === void 0 ? void 0 : _f.owner) === null || _g === void 0 ? void 0 : _g.login,
-                full_name: (_j = (_h = context === null || context === void 0 ? void 0 : context.payload) === null || _h === void 0 ? void 0 : _h.repository) === null || _j === void 0 ? void 0 : _j.full_name,
-                repo: (_l = (_k = context === null || context === void 0 ? void 0 : context.payload) === null || _k === void 0 ? void 0 : _k.repository) === null || _l === void 0 ? void 0 : _l.name
-            });
-            return;
-        }
-        if (!message.includes(KEYWORD)) {
-            core.info('Not a PR message');
-            return;
-        }
-        yield checkCompareCommits({
-            head: branch[branch.length - 1],
-            owner: (_p = (_o = (_m = context === null || context === void 0 ? void 0 : context.payload) === null || _m === void 0 ? void 0 : _m.repository) === null || _o === void 0 ? void 0 : _o.owner) === null || _p === void 0 ? void 0 : _p.login,
-            full_name: (_r = (_q = context === null || context === void 0 ? void 0 : context.payload) === null || _q === void 0 ? void 0 : _q.repository) === null || _r === void 0 ? void 0 : _r.full_name,
-            repo: (_t = (_s = context === null || context === void 0 ? void 0 : context.payload) === null || _s === void 0 ? void 0 : _s.repository) === null || _t === void 0 ? void 0 : _t.name
-        });
+        console.log(JSON.stringify(context === null || context === void 0 ? void 0 : context.payload));
+        const { message } = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.head_commit;
     }
     catch (e) {
         core.setFailed(e.message);
