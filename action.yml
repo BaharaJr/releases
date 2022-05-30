@@ -1,0 +1,24 @@
+name: 'Automatically create pr to staging'
+description: 'Run develop actions'
+author: 'Benedict Steven'
+
+inputs:
+  GITHUB_TOKEN:
+    description: 'GitHub Token'
+    required: true
+  DESTINATION_BRANCH:
+    description: 'destination branch'
+    required: true
+  KEYWORD:
+    description: 'check whether to create pr or not if keyword is in head commit'
+    required: false
+  HEAD_BRANCH:
+    description: 'base branch, if null pull request will be created from working branch'
+    required: false
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'package'
+  color: 'gray-dark'

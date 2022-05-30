@@ -1,0 +1,27 @@
+name: Merge to releases
+
+on:
+   push:
+     branches: 
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: npx yarn
+
+      - uses: ./
+        id: create_pr
+        with:
+          GITHUB_TOKEN: ${{secrets.TOKEN}}
+          DESTINATION_BRANCH: master
+      - name: test create pr response
+        run: |
+          echo "The commits was ${{ steps.create_pr.outputs.pr_body }}"
+          echo "The branch was ${{ steps.create_pr.outputs.branch }}"
+          echo "The pr number was ${{ steps.create_pr.outputs.pull_number }}"
+          echo "The pr url was ${{ steps.create_pr.outputs.html_url }}"
