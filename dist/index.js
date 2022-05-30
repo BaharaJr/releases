@@ -43,6 +43,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
 const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+const SLACK_URL = core.getInput('SLACK_URL');
+const ASSETS_LOCATION = core.getInput('ASSETS_LOCATION');
 const octokit = github.getOctokit(GITHUB_TOKEN);
 const { context = {} } = github;
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -57,18 +59,28 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const releaseFromPR = () => __awaiter(void 0, void 0, void 0, function* () {
-    const { owner, repo, pull_number } = context.payload;
-    octokit.rest.pulls.listCommits({
-        owner,
-        repo,
-        pull_number,
-    });
+    var _a, _b, _c, _d, _e, _f, _g, _h;
+    const newFeatures = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.commits) === null || _b === void 0 ? void 0 : _b.filter(({ message }) => message.includes('feat'));
+    const bugFixes = (_d = (_c = context === null || context === void 0 ? void 0 : context.payload) === null || _c === void 0 ? void 0 : _c.commits) === null || _d === void 0 ? void 0 : _d.filter(({ message }) => message.includes('bug') || message.includes('fix'));
+    const docs = (_f = (_e = context === null || context === void 0 ? void 0 : context.payload) === null || _e === void 0 ? void 0 : _e.commits) === null || _f === void 0 ? void 0 : _f.filter(({ message }) => message.includes('docs'));
+    const uncategorized = (_h = (_g = context === null || context === void 0 ? void 0 : context.payload) === null || _g === void 0 ? void 0 : _g.commits) === null || _h === void 0 ? void 0 : _h.filter(({ message }) => !message.includes('bug') ||
+        !message.includes('fix') ||
+        !message.includes('feat') ||
+        !message.includes('chore') ||
+        !message.includes('docs'));
+    // await axios.post(SLACK_URL)
 });
 const releaseFromPush = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _j, _k, _l, _m, _o, _p, _q, _r;
     try {
-        console.log(JSON.stringify(context === null || context === void 0 ? void 0 : context.payload));
-        const { message } = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.head_commit;
+        const newFeatures = (_k = (_j = context === null || context === void 0 ? void 0 : context.payload) === null || _j === void 0 ? void 0 : _j.commits) === null || _k === void 0 ? void 0 : _k.filter(({ message }) => message.includes('feat'));
+        const bugFixes = (_m = (_l = context === null || context === void 0 ? void 0 : context.payload) === null || _l === void 0 ? void 0 : _l.commits) === null || _m === void 0 ? void 0 : _m.filter(({ message }) => message.includes('bug') || message.includes('fix'));
+        const docs = (_p = (_o = context === null || context === void 0 ? void 0 : context.payload) === null || _o === void 0 ? void 0 : _o.commits) === null || _p === void 0 ? void 0 : _p.filter(({ message }) => message.includes('docs'));
+        const uncategorized = (_r = (_q = context === null || context === void 0 ? void 0 : context.payload) === null || _q === void 0 ? void 0 : _q.commits) === null || _r === void 0 ? void 0 : _r.filter(({ message }) => !message.includes('bug') ||
+            !message.includes('fix') ||
+            !message.includes('feat') ||
+            !message.includes('chore') ||
+            !message.includes('docs'));
     }
     catch (e) {
         core.setFailed(e.message);

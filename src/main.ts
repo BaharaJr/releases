@@ -39,7 +39,7 @@ const uncategorized = context?.payload?.commits?.filter(
     !message.includes('chore') ||
     !message.includes('docs')
 )
-await axios.post(SLACK_URL)
+// await axios.post(SLACK_URL)
 }
 const releaseFromPush = async (): Promise<void> => {
   try {
