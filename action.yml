@@ -1,19 +1,19 @@
-name: 'Automatically create pr to staging'
+name: 'Automatically create releases from either PR or Push events'
 description: 'Run develop actions'
-author: 'Benedict Steven'
+author: 'Bennett Benedict'
 
 inputs:
   GITHUB_TOKEN:
     description: 'GitHub Token'
     required: true
-  DESTINATION_BRANCH:
-    description: 'destination branch'
-    required: true
-  KEYWORD:
-    description: 'check whether to create pr or not if keyword is in head commit'
+  ASSETS_LOCATION:
+    description: 'Assets location if any'
     required: false
-  HEAD_BRANCH:
-    description: 'base branch, if null pull request will be created from working branch'
+  SLACK_URL:
+    description: 'Slack URL for releases'
+    required: false
+  GITHUB_RELEASES:
+    description: 'If to create a GitHub releases or not'
     required: false
 runs:
   using: 'node16'

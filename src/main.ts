@@ -1,8 +1,11 @@
 /* eslint-disable camelcase */
 import * as github from '@actions/github'
 import * as core from '@actions/core'
+import axios from 'axios'
 
 const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
+const SLACK_URL = core.getInput('SLACK_URL')
+const ASSETS_LOCATION = core.getInput('ASSETS_LOCATION')
 const octokit = github.getOctokit(GITHUB_TOKEN)
 const {context = {}}: any = github
 
@@ -19,14 +22,24 @@ const run = async () => {
 }
 
 const releaseFromPR = async (): Promise<void> => {
-  console.log('FROM PR',JSON.stringify(context?.payload))
-
-  const {owner, repo, pull_number} = context.payload
-  octokit.rest.pulls.listCommits({
-    owner,
-    repo,
-    pull_number
-  })
+  const newFeatures = context?.payload?.commits?.filter(({message}) =>
+  message.includes('feat')
+)
+const bugFixes = context?.payload?.commits?.filter(
+  ({message}) => message.includes('bug') || message.includes('fix')
+)
+const docs = context?.payload?.commits?.filter(
+  ({message}) => message.includes('docs')
+)
+const uncategorized = context?.payload?.commits?.filter(
+  ({message}) =>
+    !message.includes('bug') ||
+    !message.includes('fix') ||
+    !message.includes('feat') ||
+    !message.includes('chore') ||
+    !message.includes('docs')
+)
+await axios.post(SLACK_URL)
 }
 const releaseFromPush = async (): Promise<void> => {
   try {
