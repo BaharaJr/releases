@@ -95,7 +95,7 @@ const releaseFromPush = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newFeatures = (_q = (_p = (_o = context === null || context === void 0 ? void 0 : context.payload) === null || _o === void 0 ? void 0 : _o.commits) === null || _p === void 0 ? void 0 : _p.filter(({ message }) => message.includes('feat'))) === null || _q === void 0 ? void 0 : _q.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
         const bugFixes = (_t = (_s = (_r = context === null || context === void 0 ? void 0 : context.payload) === null || _r === void 0 ? void 0 : _r.commits) === null || _s === void 0 ? void 0 : _s.filter(({ message }) => message.includes('bug') || message.includes('fix'))) === null || _t === void 0 ? void 0 : _t.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const docs = (_w = (_v = (_u = context === null || context === void 0 ? void 0 : context.payload) === null || _u === void 0 ? void 0 : _u.commits) === null || _v === void 0 ? void 0 : _v.filter(({ message }) => message.includes('docs'))) === null || _w === void 0 ? void 0 : _w.map((commit, i) => `${i}. ${commit.message}`);
+        const docs = (_w = (_v = (_u = context === null || context === void 0 ? void 0 : context.payload) === null || _u === void 0 ? void 0 : _u.commits) === null || _v === void 0 ? void 0 : _v.filter(({ message }) => message.includes('docs'))) === null || _w === void 0 ? void 0 : _w.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
         const uncategorized = (_z = (_y = (_x = context === null || context === void 0 ? void 0 : context.payload) === null || _x === void 0 ? void 0 : _x.commits) === null || _y === void 0 ? void 0 : _y.filter(({ message }) => !message.includes('bug') ||
             !message.includes('fix') ||
             !message.includes('feat') ||
@@ -142,7 +142,7 @@ const getWebHookOptions = ({ newFeatures, docs, bugFixes, uncategorized }) => {
                 text: {
                     type: 'mrkdwn',
                     text: `New Features`,
-                    fields: [{ type: 'mrkdwn', text: newFeatures }]
+                    fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
                 }
             },
             {
@@ -153,7 +153,7 @@ const getWebHookOptions = ({ newFeatures, docs, bugFixes, uncategorized }) => {
                 text: {
                     type: 'mrkdwn',
                     text: `Bug Fixes`,
-                    fields: [{ type: 'mrkdwn', text: bugFixes }]
+                    fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
                 }
             },
             {
@@ -164,7 +164,7 @@ const getWebHookOptions = ({ newFeatures, docs, bugFixes, uncategorized }) => {
                 text: {
                     type: 'mrkdwn',
                     text: `Documentation`,
-                    fields: [{ type: 'mrkdwn', text: docs }]
+                    fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
                 }
             },
             {
@@ -175,7 +175,7 @@ const getWebHookOptions = ({ newFeatures, docs, bugFixes, uncategorized }) => {
                 text: {
                     type: 'mrkdwn',
                     text: `Miscellaneous`,
-                    fields: [{ type: 'mrkdwn', text: uncategorized }]
+                    fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
                 }
             }
         ]

@@ -89,7 +89,10 @@ const releaseFromPush = async (): Promise<void> => {
       .join('\n\n > ')
     const docs = context?.payload?.commits
       ?.filter(({message}) => message.includes('docs'))
-      ?.map((commit: {message: string}, i: number) => `${i}. ${commit.message}`)
+      ?.map(
+        (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
+      )
+      .join('\n\n > ')
     const uncategorized = context?.payload?.commits
       ?.filter(
         ({message}) =>
@@ -144,7 +147,7 @@ const getWebHookOptions = ({newFeatures, docs, bugFixes, uncategorized}) => {
         text: {
           type: 'mrkdwn',
           text: `New Features`,
-          fields: [{type: 'mrkdwn', text: newFeatures}]
+          fields: [{type: 'mrkdwn', text: '1. add test webhook sms'}]
         }
       },
       {
@@ -155,7 +158,7 @@ const getWebHookOptions = ({newFeatures, docs, bugFixes, uncategorized}) => {
         text: {
           type: 'mrkdwn',
           text: `Bug Fixes`,
-          fields: [{type: 'mrkdwn', text: bugFixes}]
+          fields: [{type: 'mrkdwn', text: '1. add test webhook sms'}]
         }
       },
       {
@@ -166,7 +169,7 @@ const getWebHookOptions = ({newFeatures, docs, bugFixes, uncategorized}) => {
         text: {
           type: 'mrkdwn',
           text: `Documentation`,
-          fields: [{type: 'mrkdwn', text: docs}]
+          fields: [{type: 'mrkdwn', text: '1. add test webhook sms'}]
         }
       },
       {
@@ -177,7 +180,7 @@ const getWebHookOptions = ({newFeatures, docs, bugFixes, uncategorized}) => {
         text: {
           type: 'mrkdwn',
           text: `Miscellaneous`,
-          fields: [{type: 'mrkdwn', text: uncategorized}]
+          fields: [{type: 'mrkdwn', text: '1. add test webhook sms'}]
         }
       }
     ]
