@@ -151,9 +151,6 @@ const getWebHookOptions = ({newFeatures, docs, bugFixes, uncategorized}) => {
         }
       },
       {
-        type: 'divider'
-      },
-      {
         type: 'section',
         text: {
           type: 'mrkdwn',
@@ -162,18 +159,12 @@ const getWebHookOptions = ({newFeatures, docs, bugFixes, uncategorized}) => {
         }
       },
       {
-        type: 'divider'
-      },
-      {
         type: 'section',
         text: {
           type: 'mrkdwn',
           text: `Documentation`,
           fields: [{type: 'mrkdwn', text: '1. add test webhook sms'}]
         }
-      },
-      {
-        type: 'divider'
       },
       {
         type: 'section',
