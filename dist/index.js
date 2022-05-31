@@ -68,21 +68,27 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 const releaseFromPR = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-    const newFeatures = (_c = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.commits) === null || _b === void 0 ? void 0 : _b.filter(({ message }) => message.includes('feat'))) === null || _c === void 0 ? void 0 : _c.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-    const bugFixes = (_f = (_e = (_d = context === null || context === void 0 ? void 0 : context.payload) === null || _d === void 0 ? void 0 : _d.commits) === null || _e === void 0 ? void 0 : _e.filter(({ message }) => message.includes('bug') || message.includes('fix'))) === null || _f === void 0 ? void 0 : _f.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-    const docs = (_j = (_h = (_g = context === null || context === void 0 ? void 0 : context.payload) === null || _g === void 0 ? void 0 : _g.commits) === null || _h === void 0 ? void 0 : _h.filter(({ message }) => message.includes('docs'))) === null || _j === void 0 ? void 0 : _j.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-    const uncategorized = (_m = (_l = (_k = context === null || context === void 0 ? void 0 : context.payload) === null || _k === void 0 ? void 0 : _k.commits) === null || _l === void 0 ? void 0 : _l.filter(({ message }) => !message.includes('bug') ||
-        !message.includes('fix') ||
-        !message.includes('feat') ||
-        !message.includes('chore') ||
-        !message.includes('docs'))) === null || _m === void 0 ? void 0 : _m.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-    const options = getWebHookOptions({
-        newFeatures,
-        docs,
-        bugFixes,
-        uncategorized
-    });
-    yield axios_1.default.post(SLACK_WEBHOOK_URL, JSON.stringify(options));
+    try {
+        const newFeatures = (_c = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.commits) === null || _b === void 0 ? void 0 : _b.filter(({ message }) => message.includes('feat'))) === null || _c === void 0 ? void 0 : _c.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
+        const bugFixes = (_f = (_e = (_d = context === null || context === void 0 ? void 0 : context.payload) === null || _d === void 0 ? void 0 : _d.commits) === null || _e === void 0 ? void 0 : _e.filter(({ message }) => message.includes('bug') || message.includes('fix'))) === null || _f === void 0 ? void 0 : _f.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
+        const docs = (_j = (_h = (_g = context === null || context === void 0 ? void 0 : context.payload) === null || _g === void 0 ? void 0 : _g.commits) === null || _h === void 0 ? void 0 : _h.filter(({ message }) => message.includes('docs'))) === null || _j === void 0 ? void 0 : _j.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
+        const uncategorized = (_m = (_l = (_k = context === null || context === void 0 ? void 0 : context.payload) === null || _k === void 0 ? void 0 : _k.commits) === null || _l === void 0 ? void 0 : _l.filter(({ message }) => !message.includes('bug') ||
+            !message.includes('fix') ||
+            !message.includes('feat') ||
+            !message.includes('chore') ||
+            !message.includes('docs'))) === null || _m === void 0 ? void 0 : _m.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
+        const options = getWebHookOptions({
+            newFeatures,
+            docs,
+            bugFixes,
+            uncategorized
+        });
+        yield axios_1.default.post(SLACK_WEBHOOK_URL, JSON.stringify(options));
+    }
+    catch (e) {
+        console.log(e);
+        core.setFailed('Failed to send to slack');
+    }
 });
 const releaseFromPush = () => __awaiter(void 0, void 0, void 0, function* () {
     var _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
@@ -104,7 +110,8 @@ const releaseFromPush = () => __awaiter(void 0, void 0, void 0, function* () {
         yield axios_1.default.post(SLACK_WEBHOOK_URL, JSON.stringify(options));
     }
     catch (e) {
-        core.setFailed(e.message);
+        console.log(e);
+        core.setFailed('Failed to send to slack');
     }
 });
 const getWebHookOptions = ({ newFeatures, docs, bugFixes, uncategorized }) => {

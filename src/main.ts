@@ -25,44 +25,51 @@ const run = async () => {
 }
 
 const releaseFromPR = async (): Promise<void> => {
-  const newFeatures = context?.payload?.commits
-    ?.filter(({message}) => message.includes('feat'))
-    ?.map(
-      (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
-    )
-    .join('\n\n > ')
-  const bugFixes = context?.payload?.commits
-    ?.filter(({message}) => message.includes('bug') || message.includes('fix'))
-    ?.map(
-      (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
-    )
-    .join('\n\n > ')
-  const docs = context?.payload?.commits
-    ?.filter(({message}) => message.includes('docs'))
-    ?.map(
-      (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
-    )
-    .join('\n\n > ')
-  const uncategorized = context?.payload?.commits
-    ?.filter(
-      ({message}) =>
-        !message.includes('bug') ||
-        !message.includes('fix') ||
-        !message.includes('feat') ||
-        !message.includes('chore') ||
-        !message.includes('docs')
-    )
-    ?.map(
-      (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
-    )
-    .join('\n\n > ')
-  const options = getWebHookOptions({
-    newFeatures,
-    docs,
-    bugFixes,
-    uncategorized
-  })
-  await axios.post(SLACK_WEBHOOK_URL, JSON.stringify(options))
+  try {
+    const newFeatures = context?.payload?.commits
+      ?.filter(({message}) => message.includes('feat'))
+      ?.map(
+        (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
+      )
+      .join('\n\n > ')
+    const bugFixes = context?.payload?.commits
+      ?.filter(
+        ({message}) => message.includes('bug') || message.includes('fix')
+      )
+      ?.map(
+        (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
+      )
+      .join('\n\n > ')
+    const docs = context?.payload?.commits
+      ?.filter(({message}) => message.includes('docs'))
+      ?.map(
+        (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
+      )
+      .join('\n\n > ')
+    const uncategorized = context?.payload?.commits
+      ?.filter(
+        ({message}) =>
+          !message.includes('bug') ||
+          !message.includes('fix') ||
+          !message.includes('feat') ||
+          !message.includes('chore') ||
+          !message.includes('docs')
+      )
+      ?.map(
+        (commit: {message: string}, i: number) => `${i + 1}. ${commit.message}`
+      )
+      .join('\n\n > ')
+    const options = getWebHookOptions({
+      newFeatures,
+      docs,
+      bugFixes,
+      uncategorized
+    })
+    await axios.post(SLACK_WEBHOOK_URL, JSON.stringify(options))
+  } catch (e) {
+    console.log(e)
+    core.setFailed('Failed to send to slack')
+  }
 }
 const releaseFromPush = async (): Promise<void> => {
   try {
@@ -104,7 +111,8 @@ const releaseFromPush = async (): Promise<void> => {
     })
     await axios.post(SLACK_WEBHOOK_URL, JSON.stringify(options))
   } catch (e) {
-    core.setFailed(e.message)
+    console.log(e)
+    core.setFailed('Failed to send to slack')
   }
 }
 
