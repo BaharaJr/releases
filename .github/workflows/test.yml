@@ -1,8 +1,8 @@
 name: Merge to releases
 
 on:
-   push:
-     branches: 
+  push:
+    branches:
       - '*'
 
 jobs:
@@ -18,6 +18,7 @@ jobs:
         id: create_pr
         with:
           GITHUB_TOKEN: ${{secrets.TOKEN}}
+          SLACK_URL: ${{secrets.SLACK_URL}}
       - name: test create pr response
         run: |
           echo "The commits was ${{ steps.create_pr.outputs.pr_body }}"

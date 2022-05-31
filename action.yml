@@ -15,6 +15,9 @@ inputs:
   GITHUB_RELEASES:
     description: 'If to create a GitHub releases or not'
     required: false
+  SLACK_WEBHOOK_URL:
+    description: 'Slack webhook URL'
+    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'
