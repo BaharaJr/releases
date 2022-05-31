@@ -144,30 +144,6 @@ const getWebHookOptions = ({ newFeatures, docs, bugFixes, uncategorized }) => {
                     text: `New Features`,
                     fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
                 }
-            },
-            {
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: `Bug Fixes`,
-                    fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
-                }
-            },
-            {
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: `Documentation`,
-                    fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
-                }
-            },
-            {
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: `Miscellaneous`,
-                    fields: [{ type: 'mrkdwn', text: '1. add test webhook sms' }]
-                }
             }
         ]
     };
