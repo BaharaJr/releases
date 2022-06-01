@@ -5,19 +5,25 @@ author: 'Bennett Benedict'
 inputs:
   GITHUB_TOKEN:
     description: 'GitHub Token'
-    required: true
+    required: false
   ASSETS_LOCATION:
     description: 'Assets location if any'
     required: false
-  SLACK_URL:
-    description: 'Slack URL for releases'
+  SLACK_ASSET:
+    description: 'Whether to send assets to slack or not.'
     required: false
-  GITHUB_RELEASES:
-    description: 'If to create a GitHub releases or not'
+  ASSETS:
+    description: 'Whether to upload assets to GitHub or not'
+    required: false
+  SLACK_CHANNEL:
+    description: 'Slack channel to send assets'
     required: false
   SLACK_WEBHOOK_URL:
     description: 'Slack webhook URL'
     required: false
+  APP_NAME:
+    description: 'App Name'
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'
