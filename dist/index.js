@@ -41,21 +41,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
 const axios_1 = __importDefault(__nccwpck_require__(6545));
 // const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
-// const SLACK_URL = core.getInput('SLACK_URL')
-// const ASSETS_LOCATION = core.getInput('ASSETS_LOCATION')
-// const GITHUB_RELEASES = core.getInput('GITHUB_RELEASES')
-// const APP_NAME = core.getInput('APP_NAME')
-const APP_NAME = 'TEST';
-const SLACK_WEBHOOK_URL = core.getInput('SLACK_WEBHOOK_URL');
 // const octokit = github.getOctokit(GITHUB_TOKEN)
+// const SLACK_UPLOADS = 'https://slack.com/api/files.upload'
+// const INITIAL_COMMENT = core.getInput('INITIAL_COMMENT')
+const SLACK_CHANNEL = core.getInput('SLACK_CHANNEL');
+const SLACK_ASSET = core.getInput('SLACK_ASSET');
+const ASSETS_LOCATION = core.getInput('ASSETS_LOCATION');
+const ASSETS = core.getInput('ASSETS');
+const GITHUB_RELEASES = core.getInput('GITHUB_RELEASES');
+const APP_NAME = core.getInput('APP_NAME');
+const SLACK_WEBHOOK_URL = core.getInput('SLACK_WEBHOOK_URL');
 const { context = {} } = github;
+const newFeatures = (_c = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.commits) === null || _b === void 0 ? void 0 : _b.filter(({ message }) => message.includes('feat'))) === null || _c === void 0 ? void 0 : _c.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
+const bugFixes = (_f = (_e = (_d = context === null || context === void 0 ? void 0 : context.payload) === null || _d === void 0 ? void 0 : _d.commits) === null || _e === void 0 ? void 0 : _e.filter(({ message }) => message.includes('bug') || message.includes('fix'))) === null || _f === void 0 ? void 0 : _f.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
+const docs = (_j = (_h = (_g = context === null || context === void 0 ? void 0 : context.payload) === null || _g === void 0 ? void 0 : _g.commits) === null || _h === void 0 ? void 0 : _h.filter(({ message }) => message.includes('docs'))) === null || _j === void 0 ? void 0 : _j.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
+const uncategorized = (_m = (_l = (_k = context === null || context === void 0 ? void 0 : context.payload) === null || _k === void 0 ? void 0 : _k.commits) === null || _l === void 0 ? void 0 : _l.filter(({ message }) => !message.includes('bug') &&
+    !message.includes('fix') &&
+    !message.includes('feat') &&
+    !message.includes('chore') &&
+    !message.includes('docs'))) === null || _m === void 0 ? void 0 : _m.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
+    checkParams();
     const eventName = context.eventName;
     switch (eventName) {
         case 'push':
@@ -66,62 +79,60 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             return releaseFromPush();
     }
 });
+const checkParams = () => {
+    if (!SLACK_WEBHOOK_URL && !GITHUB_RELEASES) {
+        core.setFailed('Atleast one functionality is required');
+        return;
+    }
+    if (GITHUB_RELEASES && ASSETS && !ASSETS_LOCATION) {
+        core.setFailed('GitHub Assets require an asset location');
+        return;
+    }
+    if (SLACK_ASSET && !SLACK_CHANNEL) {
+        core.setFailed('Slack channel is required to send  Assets');
+        return;
+    }
+};
 const releaseFromPR = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     try {
-        const newFeatures = (_c = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.commits) === null || _b === void 0 ? void 0 : _b.filter(({ message }) => message.includes('feat'))) === null || _c === void 0 ? void 0 : _c.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const bugFixes = (_f = (_e = (_d = context === null || context === void 0 ? void 0 : context.payload) === null || _d === void 0 ? void 0 : _d.commits) === null || _e === void 0 ? void 0 : _e.filter(({ message }) => message.includes('bug') || message.includes('fix'))) === null || _f === void 0 ? void 0 : _f.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const docs = (_j = (_h = (_g = context === null || context === void 0 ? void 0 : context.payload) === null || _g === void 0 ? void 0 : _g.commits) === null || _h === void 0 ? void 0 : _h.filter(({ message }) => message.includes('docs'))) === null || _j === void 0 ? void 0 : _j.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const uncategorized = (_m = (_l = (_k = context === null || context === void 0 ? void 0 : context.payload) === null || _k === void 0 ? void 0 : _k.commits) === null || _l === void 0 ? void 0 : _l.filter(({ message }) => !message.includes('bug') ||
-            !message.includes('fix') ||
-            !message.includes('feat') ||
-            !message.includes('chore') ||
-            !message.includes('docs'))) === null || _m === void 0 ? void 0 : _m.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const options = getWebHookOptions({
-            newFeatures,
-            docs,
-            bugFixes,
-            uncategorized
-        });
-        yield axios_1.default.post(SLACK_WEBHOOK_URL, JSON.stringify(options));
+        if (SLACK_WEBHOOK_URL) {
+            const options = getWebHookOptions();
+            yield axios_1.default.post(SLACK_WEBHOOK_URL, JSON.stringify(options));
+        }
+        if (SLACK_ASSET) {
+            core.warning('Slack Assets are currently not supported');
+            /*
+            const formData = new FormData()
+            formData.append('file', readFileSync(ASSETS_LOCATION))
+            formData.append('initial_comment', INITIAL_COMMENT || '')
+            formData.append('channels', SLACK_CHANNEL)
+      
+            await axios.post(SLACK_UPLOADS)
+            */
+        }
+        return;
     }
     catch (e) {
-        console.log(e);
         core.setFailed('Failed to send to slack');
     }
 });
 const releaseFromPush = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
     try {
-        const newFeatures = (_q = (_p = (_o = context === null || context === void 0 ? void 0 : context.payload) === null || _o === void 0 ? void 0 : _o.commits) === null || _p === void 0 ? void 0 : _p.filter(({ message }) => message.includes('feat'))) === null || _q === void 0 ? void 0 : _q.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const bugFixes = (_t = (_s = (_r = context === null || context === void 0 ? void 0 : context.payload) === null || _r === void 0 ? void 0 : _r.commits) === null || _s === void 0 ? void 0 : _s.filter(({ message }) => message.includes('bug') || message.includes('fix'))) === null || _t === void 0 ? void 0 : _t.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const docs = (_w = (_v = (_u = context === null || context === void 0 ? void 0 : context.payload) === null || _u === void 0 ? void 0 : _u.commits) === null || _v === void 0 ? void 0 : _v.filter(({ message }) => message.includes('docs'))) === null || _w === void 0 ? void 0 : _w.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const uncategorized = (_z = (_y = (_x = context === null || context === void 0 ? void 0 : context.payload) === null || _x === void 0 ? void 0 : _x.commits) === null || _y === void 0 ? void 0 : _y.filter(({ message }) => !message.includes('bug') ||
-            !message.includes('fix') ||
-            !message.includes('feat') ||
-            !message.includes('chore') ||
-            !message.includes('docs'))) === null || _z === void 0 ? void 0 : _z.map((commit, i) => `${i + 1}. ${commit.message}`).join('\n\n > ');
-        const options = getWebHookOptions({
-            newFeatures,
-            docs,
-            bugFixes,
-            uncategorized
-        });
+        const options = getWebHookOptions();
         yield axios_1.default.post(SLACK_WEBHOOK_URL, JSON.stringify(options));
     }
     catch (e) {
-        console.log(e);
         core.setFailed('Failed to send to slack');
     }
 });
-const getWebHookOptions = ({ newFeatures, docs, bugFixes, uncategorized }) => {
+const getWebHookOptions = () => {
     return {
         blocks: [
             {
                 type: 'header',
                 text: {
                     type: 'plain_text',
-                    text: `:sparkles: New version released on *${APP_NAME}*`,
+                    text: `New version released on ${APP_NAME}`,
                     emoji: true
                 }
             },

@@ -110,7 +110,7 @@ const getWebHookOptions = () => {
         type: 'header',
         text: {
           type: 'plain_text',
-          text: `:sparkles: New version released on *${APP_NAME}*`,
+          text: `New version released on ${APP_NAME}`,
           emoji: true
         }
       },
